@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace ShootEmUp
 {
-    public sealed class BulletSystem : MonoBehaviour
+    public sealed class BulletSystem : MonoBehaviour, IGameStartListener, IGamePauseListener, IGameResumeListener
     {
         [SerializeField] private IBulletCollisionHandler _bulletCollision;
         [SerializeField] private IBulletPool _bulletPool;
@@ -16,6 +17,7 @@ namespace ShootEmUp
 
         private readonly HashSet<Bullet> _activeBullets = new();
         private readonly List<Bullet> _cache = new();
+        public event Action BulletUpdate;
         
         private void Awake()
         {
@@ -25,6 +27,11 @@ namespace ShootEmUp
         }
         
         private void FixedUpdate()
+        {
+            UpdateBullets();
+        }
+
+        private void UpdateBullets()
         {
             _cache.Clear();
             _cache.AddRange(_activeBullets);
@@ -49,7 +56,7 @@ namespace ShootEmUp
             bullet.SetPhysicsLayer(args.physicsLayer);
             bullet.BulletData.Damage = args.damage;
             bullet.BulletData.IsPlayer = args.isPlayer;
-            bullet.SetVelocity(args.velocity);
+            bullet.StartVelocity(args.velocity);
             
             if (_activeBullets.Add(bullet))
             {
@@ -66,7 +73,28 @@ namespace ShootEmUp
                 _bulletPool.Return(bullet);
             }
         }
-        
+
+        public void StartGame()
+        {
+            
+        }
+
+        public void PauseGame()
+        {
+            foreach (var bullet in _activeBullets)
+            {
+                bullet.ResetVelocity();
+            }               
+        }
+
+        public void ResumeGame()
+        {
+            foreach (var bullet in _activeBullets)
+            {
+                bullet.ReturnToStartVelocity();
+            }
+        }
+
         public struct Args
         {
             public Vector2 position;

@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace ShootEmUp
 {
-    public sealed class EnemyPool : MonoBehaviour
+    public sealed class EnemyPool : MonoBehaviour, IGameStartListener, IGameResumeListener, IGamePauseListener
     {
+        public MoveComponent[] AllMoveComponents { get; private set; }
+        public event Action OnInitialized;
+
         [Header("Spawn")]
         [SerializeField] private EnemyPositions _enemyPositions;
         [SerializeField] private GameObject _character;
@@ -18,19 +22,23 @@ namespace ShootEmUp
 
         private readonly Queue<GameObject> _enemyPool = new();
         private int _maximumEnemyCount = 7;
-
-        private void Awake()
-        {
-            for (var i = 0; i < _maximumEnemyCount; i++)
-            {
-                var enemy = Instantiate(_prefab, _container);
-                _enemyPool.Enqueue(enemy);
-            }
-        }
+        //public event Action EnemySpawn;
 
         private void Start()
         {
             _spawnEnemy = FindObjectOfType<SpawnEnemy>(); //Zenject
+            AllMoveComponents = new MoveComponent[_maximumEnemyCount];
+
+            for (var i = 0; i < _maximumEnemyCount; i++)
+            {
+                var enemy = Instantiate(_prefab, _container);
+                MoveComponent moveComponent = enemy.GetComponent<MoveComponent>();
+                AllMoveComponents[i] = moveComponent;
+
+                _enemyPool.Enqueue(enemy);
+            }
+
+            OnInitialized?.Invoke();
         }
 
         public GameObject SpawnEnemy()
@@ -52,6 +60,21 @@ namespace ShootEmUp
         {
             enemy.transform.SetParent(_container);
             _enemyPool.Enqueue(enemy);
+        }
+
+        public void StartGame()
+        {
+            
+        }
+
+        public void ResumeGame()
+        {
+            
+        }
+
+        public void PauseGame()
+        {
+            
         }
     }
 }

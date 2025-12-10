@@ -10,12 +10,13 @@ namespace ShootEmUp
         private void Awake()
         {
             _params = FindObjectOfType<ParamsBackground>();
-            _backgroundMovable = new BackgroundMove(_params);
+            _backgroundMovable = FindObjectOfType <BackgroundMove>();
+            _backgroundMovable.Init(_params);
         }
 
         private void FixedUpdate()
         {
-            _backgroundMovable.Move();
+            _backgroundMovable.MoveScreen();
         }
     }
 }

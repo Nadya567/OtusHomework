@@ -10,6 +10,7 @@ namespace ShootEmUp
         [SerializeField] private IBulletPhysics _bulletPhisics;
         [SerializeField] private IBulletVisual _bulletVisual;   //Zenject
         [HideInInspector] public IBulletData BulletData;
+        private Vector2 _startVelocity;
 
         private void Awake()
         {
@@ -18,15 +19,25 @@ namespace ShootEmUp
             BulletData = FindObjectOfType<BulletData>();
         }
 
-
         private void OnCollisionEnter2D(Collision2D collision)
         {
             OnCollisionEntered?.Invoke(this, collision);
         }
 
-        public void SetVelocity(Vector2 velocity)
+        public void StartVelocity(Vector2 velocity)
         {
-            _bulletPhisics.SetVelocity(velocity);
+            _startVelocity = velocity;
+            SetVelocity(velocity);
+        }
+
+        public void ReturnToStartVelocity()
+        {
+            SetVelocity(_startVelocity);
+        }
+
+        public void ResetVelocity()
+        {
+            SetVelocity(Vector2.zero);
         }
 
         public void SetPhysicsLayer(int physicsLayer)
@@ -42,6 +53,11 @@ namespace ShootEmUp
         public void SetColor(Color color)
         {
             _bulletVisual.SetColor(color);
+        }
+
+        private void SetVelocity(Vector2 velocity)
+        {
+            _bulletPhisics.SetVelocity(velocity);
         }
     }
 }

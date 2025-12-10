@@ -3,12 +3,18 @@ using UnityEngine;
 
 namespace ShootEmUp
 {
-    public class InputKeyboard : MonoBehaviour, IInput
+    public class InputKeyboard : MonoBehaviour, IInput, IGameStartListener, IGameResumeListener, IGamePauseListener
     {
         public event Action<int> RightLeftMovement;
         public event Action Fire;
+        public event Action KeybordInputCame;
 
         private void Update()
+        {
+            KeybordInputCame?.Invoke();
+        }
+
+        private void ReadInputs()
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -24,6 +30,21 @@ namespace ShootEmUp
             {
                 RightLeftMovement?.Invoke(1);
             }
+        }
+
+        public void StartGame()
+        {
+            KeybordInputCame += ReadInputs;
+        }
+
+        public void ResumeGame()
+        {
+            KeybordInputCame += ReadInputs;
+        }
+
+        public void PauseGame()
+        {
+            KeybordInputCame -= ReadInputs;
         }
     }
 }

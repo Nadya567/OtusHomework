@@ -19,7 +19,7 @@ namespace ShootEmUp
 
         private void Start()
         {
-            _moveComponent = FindObjectOfType<MoveComponent>();
+            _moveComponent = GetComponent<MoveComponent>();
         }
 
         public void SetDestination(Vector2 endPoint)
@@ -41,7 +41,8 @@ namespace ShootEmUp
             }
 
             var direction = vector.normalized * Time.fixedDeltaTime;
-            _moveComponent.Move(direction);
+            //_moveComponent.Move(direction);
+            _moveComponent.MoveActionStart(direction);
         }
     }
 }
